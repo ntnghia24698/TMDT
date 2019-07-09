@@ -1,5 +1,6 @@
 .logo{
 	text-align: center;
+ margin-top: 100px;
 }
 .login{
 	text-align: center;
@@ -9,6 +10,8 @@
 	    border: 1px solid black;
     width: 30%;
     margin-left: 35%;
+      box-sizing: border-box;
+    padding: 18px;
 }
 .label-link{
 	margin-left: 16%;
@@ -34,6 +37,6 @@
 .dangnhap2{
 	    padding: 3%;
     width: 50%;
-    background: green;
+    background: #28a745;
     color: white;
 }

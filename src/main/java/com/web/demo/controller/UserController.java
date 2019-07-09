@@ -1,41 +1,47 @@
 package com.web.demo.controller;
 
-import java.util.HashMap;
-import java.util.Map;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.web.demo.common.Constants;
-import com.web.demo.model.Customer;
-import com.web.demo.service.Impl.UserServiceImpl;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.web.demo.mapper.AccountMapper;
+import com.web.demo.model.Account;
+import com.web.demo.model.AccountExample;
+
+import com.web.demo.utils.ConnectDB;
 
 @Controller
 public class UserController {
 	
-	@RequestMapping(value="/login",method = RequestMethod.GET)
-	@ResponseBody
-	String login(@ModelAttribute("user") Customer userInf, Model model,HttpSession session) throws Exception
-	{
-		UserServiceImpl userService = new UserServiceImpl();
-		Map<String,Object> map = new HashMap<>();
-		map.putAll(userService.login(userInf.getLoginName(), userInf.getPassword()));
-		if (map.get("status")==Constants.TRUE)
+	@RequestMapping("/dangnhap")
+	//@ResponseBody
+	public void user(Model model,HttpServletRequest request,HttpServletResponse response) throws Exception{
+		AccountMapper mapper = ConnectDB.getInstance().getSession().getMapper(AccountMapper.class);
+		AccountExample example = new AccountExample();
+		String username = request.getParameter("login");
+		String password = request.getParameter("password");
+		example.createCriteria().andUsernameEqualTo(username).andPasswordEqualTo(password);
+		Account account = null;
+		if (!mapper.selectByExample(example).isEmpty())
 		{
-			session.setAttribute("status",map.get("status"));
-			session.setAttribute("customer", map.get("customer"));
+			account = mapper.selectByExample(example).get(0);
+		}		
+		
+		ConnectDB.getInstance().getSession().close();
+		if(account == null)
+		{
+				
+			 response.sendRedirect("/sign-in");
 		}
-		//modelMap.put("loginName",session.)
-		Customer customer = new Customer();
-		customer = (Customer)session.getAttribute("customer");
-		model.addAttribute("loginname",customer.getLoginName());
-		return "login";
+		else
+		{
+			 response.sendRedirect("/");
+		}
 	}
 }
